@@ -10,8 +10,16 @@ let package = Package(
     products: [
         .library(name: "SplineVectorization", targets: ["SplineVectorization"])
     ],
+    dependencies: [
+        .package(path: "../SplineDomain")
+    ],
     targets: [
-        .target(name: "SplineVectorization"),
+        .target(
+            name: "SplineVectorization",
+            dependencies: [
+                .product(name: "SplineDomain", package: "SplineDomain")
+            ]
+        ),
         .testTarget(name: "SplineVectorizationTests", dependencies: ["SplineVectorization"])
     ]
 )

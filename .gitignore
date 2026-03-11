@@ -1,0 +1,11 @@
+.DS_Store
+.build/
+DerivedData/
+Packages/*/.build/
+artifacts/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+.pi/
+AGENTS.md
+CLAUDE.md
+GEMINI.md

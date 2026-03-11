@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  lint-and-policy:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify dependency policy
+        run: node scripts/verify-dependencies.mjs
+      - name: Generate SBOM artifact
+        run: bash scripts/generate-sbom.sh
+
+  build-packages:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Swift packages
+        run: |
+          for pkg in Packages/*; do
+            if [ -f "$pkg/Package.swift" ]; then
+              (cd "$pkg" && swift build)
+            fi
+          done
+      - name: Test Swift packages
+        run: |
+          for pkg in Packages/*; do
+            if [ -f "$pkg/Package.swift" ]; then
+              (cd "$pkg" && swift test)
+            fi
+          done

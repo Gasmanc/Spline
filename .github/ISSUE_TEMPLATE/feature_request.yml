@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose a feature implementation task
+labels: ["type:feature"]
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      placeholder: Describe the feature
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      placeholder: In scope and out of scope
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: Concrete testable criteria
+    validations:
+      required: true
+  - type: input
+    id: phase
+    attributes:
+      label: Phase reference
+      placeholder: phase-0 ... phase-8
+    validations:
+      required: true

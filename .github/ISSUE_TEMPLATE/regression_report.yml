@@ -1,0 +1,29 @@
+name: Regression report
+description: Report a quality or fidelity regression
+labels: ["type:regression"]
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+    validations:
+      required: true
+  - type: input
+    id: baseline
+    attributes:
+      label: Baseline build/version
+    validations:
+      required: true
+  - type: input
+    id: regressed
+    attributes:
+      label: Regressed build/version
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      placeholder: fixture IDs, screenshots, diff metrics, logs
+    validations:
+      required: true

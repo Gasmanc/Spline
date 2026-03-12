@@ -274,3 +274,58 @@ Authoritative source:
 ### Next recommended actions
 1. Implement app-target integration and end-to-end conversion workflows using new codec and tracing services.
 2. Add matrix integration tests for additional format pairs and animation policy paths.
+
+## Session 2026-03-12 16:12 GMT+10
+
+### Participants
+- Human: Product Owner
+- Agent: Coding Assistant
+
+### Objectives
+1. Expand practical format matrix conversion paths.
+2. Wire application and storage runtime modules for executable orchestration.
+
+### Actions performed
+1. Expanded conversion runtime to route PNG/JPEG/BMP/HEIC/GIF/TIFF/WEBP/AVIF/HDR/PDF/RAW into raster and emit raster/PDF/SVG outputs where implemented.
+2. Added PDF raster decode and PDF encode support in `FileConversionService`.
+3. Added RAW decode support via Core Image in `FileConversionService`.
+4. Added storage module with app paths and conversion history persistence actors.
+5. Added application module orchestration actor and bootstrap composition.
+6. Added integration tests for file conversion, storage persistence, and orchestrator flow.
+7. Updated phase review reports and reran strict quality gates.
+
+### Decisions made
+1. EPS and SVG-as-raster source remain explicit fail-closed paths until dedicated renderers are integrated.
+2. Conversion orchestration records both success and failure outcomes to history.
+
+### Files changed
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionServiceTests.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGConversionService.swift`
+- `Packages/SplineStorage/Sources/SplineStorage/AppPaths.swift`
+- `Packages/SplineStorage/Sources/SplineStorage/ConversionHistoryStore.swift`
+- `Packages/SplineStorage/Tests/SplineStorageTests/SplineStorageTests.swift`
+- `Packages/SplineApplication/Sources/SplineApplication/ApplicationBootstrap.swift`
+- `Packages/SplineApplication/Sources/SplineApplication/ConversionOrchestrator.swift`
+- `Packages/SplineApplication/Tests/SplineApplicationTests/SplineApplicationTests.swift`
+- `docs/reviews/phase-3-review.md`
+- `docs/reviews/phase-5-review.md`
+- `docs/reviews/phase-6-review.md`
+- `sessions.md`
+
+### Tests / verification
+- Command: `scripts/run-quality-gates.sh`
+- Result: Pass
+- Command: `node ~/.pi/agent/zero-debt/scripts/zero-debt-verify.mjs`
+- Result: Pass
+
+### Risks found
+1. EPS and SVG source rasterization are not yet implemented and currently return unsupported errors.
+2. Homebrew dylib deployment-target warnings remain for local macOS toolchain linkage.
+
+### Open questions created or updated
+- O-004 remains open and now directly impacts EPS roadmap completion.
+
+### Next recommended actions
+1. Implement EPS source rendering path and SVG source rasterization path.
+2. Expand matrix tests for PDF/RAW/WebP/AVIF combinations and animation policy execution.

@@ -20,6 +20,12 @@ let package = Package(
                 .product(name: "SplineDomain", package: "SplineDomain")
             ]
         ),
-        .testTarget(name: "SplineVectorizationTests", dependencies: ["SplineVectorization"])
+        .testTarget(
+            name: "SplineVectorizationTests",
+            dependencies: ["SplineVectorization"],
+            resources: [
+                .process("Fixtures")
+            ]
+        )
     ]
 )

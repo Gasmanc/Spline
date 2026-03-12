@@ -1,16 +1,12 @@
-import CoreGraphics
 import Foundation
-import ImageIO
-import UniformTypeIdentifiers
 import XCTest
 @testable import SplineConversionEngine
 import SplineDomain
 
-final class FileConversionServiceTests: XCTestCase {
+final class FileConversionServiceTests: XCTestCase, FileConversionTestSupport {
     func testConvertPNGToSVG() throws {
         let service = FileConversionService()
-        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
-        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        let tempDir = makeTempDirectory()
 
         let inputURL = tempDir.appendingPathComponent("in.png")
         let outputURL = tempDir.appendingPathComponent("out.svg")
@@ -31,8 +27,7 @@ final class FileConversionServiceTests: XCTestCase {
 
     func testConvertEPSUsesDedicatedDecodePath() throws {
         let service = FileConversionService()
-        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
-        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        let tempDir = makeTempDirectory()
 
         let inputURL = tempDir.appendingPathComponent("in.eps")
         let outputURL = tempDir.appendingPathComponent("out.png")
@@ -53,8 +48,7 @@ final class FileConversionServiceTests: XCTestCase {
 
     func testConvertSVGToPNG() throws {
         let service = FileConversionService()
-        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
-        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        let tempDir = makeTempDirectory()
 
         let inputURL = tempDir.appendingPathComponent("in.svg")
         let outputURL = tempDir.appendingPathComponent("out.png")
@@ -79,8 +73,7 @@ final class FileConversionServiceTests: XCTestCase {
 
     func testConvertPNGToPDF() throws {
         let service = FileConversionService()
-        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
-        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+        let tempDir = makeTempDirectory()
 
         let inputURL = tempDir.appendingPathComponent("in.png")
         let outputURL = tempDir.appendingPathComponent("out.pdf")
@@ -96,40 +89,5 @@ final class FileConversionServiceTests: XCTestCase {
 
         _ = try service.convert(inputURL: inputURL, outputURL: outputURL, intent: intent)
         XCTAssertTrue(FileManager.default.fileExists(atPath: outputURL.path))
-    }
-
-    private func writePNG(to url: URL) throws {
-        guard let context = CGContext(
-            data: nil,
-            width: 8,
-            height: 8,
-            bitsPerComponent: 8,
-            bytesPerRow: 8 * 4,
-            space: CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-        ) else {
-            throw ConversionEngineError.encodeFailed
-        }
-
-        context.setFillColor(red: 0.5, green: 0.3, blue: 0.7, alpha: 1)
-        context.fill(CGRect(x: 0, y: 0, width: 8, height: 8))
-
-        guard let image = context.makeImage() else {
-            throw ConversionEngineError.encodeFailed
-        }
-
-        guard let destination = CGImageDestinationCreateWithURL(
-            url as CFURL,
-            UTType.png.identifier as CFString,
-            1,
-            nil
-        ) else {
-            throw ConversionEngineError.fileWriteFailed
-        }
-
-        CGImageDestinationAddImage(destination, image, nil)
-        guard CGImageDestinationFinalize(destination) else {
-            throw ConversionEngineError.fileWriteFailed
-        }
     }
 }

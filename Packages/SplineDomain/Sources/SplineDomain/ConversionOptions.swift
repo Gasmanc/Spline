@@ -43,6 +43,7 @@ public struct TraceControls: Codable, Sendable, Equatable {
 
 public enum MetadataPolicy: String, Codable, Sendable {
     case strip
+    case preserve
 }
 
 public struct ConversionOptions: Codable, Sendable, Equatable {

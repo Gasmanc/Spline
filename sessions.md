@@ -478,3 +478,60 @@ Authoritative source:
 ### Next recommended actions
 1. Implement full elliptical arc reconstruction for `A/a` commands.
 2. Add additional SVG path conformance fixtures for mixed command streams.
+
+## Session 2026-03-12 22:35 GMT+10
+
+### Participants
+- Human: Product Owner
+- Agent: Coding Assistant
+
+### Objectives
+1. Close post-merge delivery gaps for animation policy runtime behavior, color management, and metadata verification.
+2. Restore protected workflow and enumerate remaining release-plan decisions.
+
+### Actions performed
+1. Implemented runtime animation policy execution in conversion runtime for `preserveWhenSupported`, `firstFrameOnly`, and `splitToFrames`.
+2. Added animated decode/encode support paths and split-frame manifest output.
+3. Hardened raster output color normalization with explicit output color-space handling and CMYK fallback.
+4. Added metadata policy extension (`preserve`) and verification tests for strip-by-default plus preserve passthrough.
+5. Split work into focused PR slices and merged stacked PRs #2, #3, #4.
+6. Re-enabled `main` branch protection with required checks and required review approval.
+
+### Decisions made
+1. Runtime animation policy behavior is now executed in production conversion flow, not only in planning metadata.
+2. `MetadataPolicy` now supports `preserve` in addition to `strip`.
+
+### Files changed
+- `Packages/SplineDomain/Sources/SplineDomain/ConversionOptions.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService+Animation.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService+Color.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService+DecodeEncode.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/ImageIOCodecService.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionServiceTests.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionServiceTests+Helpers.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionAnimationPolicyTests.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionColorManagementTests.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionMetadataPolicyTests.swift`
+
+### Tests / verification
+- Command: `scripts/run-quality-gates.sh`
+- Result: Pass
+- Command: `node ~/.pi/agent/zero-debt/scripts/zero-debt-verify.mjs`
+- Result: Pass
+
+### Risks found
+1. Open product decisions O-001 through O-004 remain unresolved and are potential release blockers.
+2. EPS parity user-facing contract still requires explicit product sign-off (O-004).
+
+### Open questions created or updated
+- O-001 remains Open.
+- O-002 remains Open.
+- O-003 remains Open.
+- O-004 remains Open.
+
+### Next recommended actions
+1. Resolve O-001 to O-004 and update ADR-0001 or a follow-up ADR with final decisions.
+2. Finalize EPS parity matrix and user-facing downgrade/warning policy tied to O-004.
+3. Complete Phase 7 closeout checklist items (RC sign-off, determinism exceptions, performance thresholds).
+4. Complete Phase 8 closeout checklist items (artifact archiving and launch outcome logging).

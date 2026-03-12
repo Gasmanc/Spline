@@ -10,8 +10,16 @@ let package = Package(
     products: [
         .library(name: "SplineJobs", targets: ["SplineJobs"])
     ],
+    dependencies: [
+        .package(path: "../SplineDomain")
+    ],
     targets: [
-        .target(name: "SplineJobs"),
+        .target(
+            name: "SplineJobs",
+            dependencies: [
+                .product(name: "SplineDomain", package: "SplineDomain")
+            ]
+        ),
         .testTarget(name: "SplineJobsTests", dependencies: ["SplineJobs"])
     ]
 )

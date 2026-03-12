@@ -23,6 +23,12 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install external codec dependencies
+        run: |
+          brew install webp libavif
+      - name: Install vtracer
+        run: |
+          cargo install vtracer --locked || true
       - name: Build Swift packages
         run: |
           for pkg in Packages/*; do

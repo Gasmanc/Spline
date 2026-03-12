@@ -55,9 +55,9 @@ Authoritative source:
 
 | Date | Dependency | Intended Use | License | Decision | Notes |
 |------|------------|--------------|---------|----------|-------|
-| 2026-03-11 | libwebp | WebP decode/encode | BSD-3-Clause | Candidate Accepted Pending Verification | Validate exact version and NOTICE requirements |
-| 2026-03-11 | libavif | AVIF decode/encode | BSD-2-Clause | Candidate Accepted Pending Verification | Validate transitive dependencies |
-| 2026-03-11 | Vector tracer candidate (vtracer bridge) | Color-capable raster-to-vector | Expected permissive | Pending | License and App Store distribution check required |
+| 2026-03-11 | libwebp | WebP decode/encode | BSD-3-Clause | Locked | Integrated via `CWebPBridge` |
+| 2026-03-11 | libavif | AVIF decode/encode | BSD-2-Clause | Locked | Integrated via `CAVIFBridge` |
+| 2026-03-12 | vtracer | Color-capable raster-to-vector | MIT OR Apache-2.0 | Locked | Integrated via `ExternalVTracerService` |
 
 ---
 
@@ -214,3 +214,267 @@ Authoritative source:
 ### Next recommended actions
 1. Apply documented branch protection settings in GitHub repository configuration.
 2. Begin Phase 1 dependency candidate lock and legal validation workflow.
+
+## Session 2026-03-12 15:25 GMT+10
+
+### Participants
+- Human: Product Owner
+- Agent: Coding Assistant
+
+### Objectives
+1. Integrate approved permissive external codec and tracing dependencies.
+2. Keep strict lint, test, and zero-debt compliance.
+
+### Actions performed
+1. Installed and integrated `libwebp` and `libavif` through C bridge targets in `SplineConversionEngine`.
+2. Implemented external codec Swift bridge and wired WebP/AVIF encode/decode into runtime service.
+3. Added round-trip tests for WebP and AVIF.
+4. Installed and integrated `vtracer` via `ExternalVTracerService` in `SplineVectorization`.
+5. Added SVG conversion integration test and retained deterministic internal fallback path.
+6. Updated CI workflow to install codec dependencies.
+7. Updated dependency lock, notices, and dependency report.
+8. Updated phase review docs and executed full strict quality gates.
+
+### Decisions made
+1. External codec integration uses native C bridges with fail-closed behavior when unavailable.
+2. External tracer integration is attempted first on supported raster formats with deterministic internal fallback.
+
+### Files changed
+- `.github/workflows/ci.yml`
+- `DEPENDENCIES.md`
+- `THIRD_PARTY_NOTICES.md`
+- `dependency-report.json`
+- `Packages/SplineConversionEngine/Package.swift`
+- `Packages/SplineConversionEngine/Sources/CWebPBridge/*`
+- `Packages/SplineConversionEngine/Sources/CAVIFBridge/*`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/ExternalCodecBridge.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/ImageIOCodecService.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/ExternalCodecBridgeTests.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/ExternalVTracerService.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGConversionService.swift`
+- `Packages/SplineVectorization/Tests/SplineVectorizationTests/SVGConversionServiceTests.swift`
+- `docs/reviews/phase-1-review.md`
+- `docs/reviews/phase-3-review.md`
+- `docs/reviews/phase-4-review.md`
+- `sessions.md`
+
+### Tests / verification
+- Command: `scripts/run-quality-gates.sh`
+- Result: Pass
+- Command: `node ~/.pi/agent/zero-debt/scripts/zero-debt-verify.mjs`
+- Result: Pass
+
+### Risks found
+1. macOS linker emits deployment-target warnings for Homebrew dylibs built against newer SDK version.
+2. iOS packaging of third-party native codecs needs dedicated build and distribution strategy before app target release.
+
+### Open questions created or updated
+- O-004 remains open for EPS parity strategy across platforms.
+
+### Next recommended actions
+1. Implement app-target integration and end-to-end conversion workflows using new codec and tracing services.
+2. Add matrix integration tests for additional format pairs and animation policy paths.
+
+## Session 2026-03-12 16:12 GMT+10
+
+### Participants
+- Human: Product Owner
+- Agent: Coding Assistant
+
+### Objectives
+1. Expand practical format matrix conversion paths.
+2. Wire application and storage runtime modules for executable orchestration.
+
+### Actions performed
+1. Expanded conversion runtime to route PNG/JPEG/BMP/HEIC/GIF/TIFF/WEBP/AVIF/HDR/PDF/RAW into raster and emit raster/PDF/SVG outputs where implemented.
+2. Added PDF raster decode and PDF encode support in `FileConversionService`.
+3. Added RAW decode support via Core Image in `FileConversionService`.
+4. Added storage module with app paths and conversion history persistence actors.
+5. Added application module orchestration actor and bootstrap composition.
+6. Added integration tests for file conversion, storage persistence, and orchestrator flow.
+7. Updated phase review reports and reran strict quality gates.
+
+### Decisions made
+1. EPS and SVG-as-raster source remain explicit fail-closed paths until dedicated renderers are integrated.
+2. Conversion orchestration records both success and failure outcomes to history.
+
+### Files changed
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionServiceTests.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGConversionService.swift`
+- `Packages/SplineStorage/Sources/SplineStorage/AppPaths.swift`
+- `Packages/SplineStorage/Sources/SplineStorage/ConversionHistoryStore.swift`
+- `Packages/SplineStorage/Tests/SplineStorageTests/SplineStorageTests.swift`
+- `Packages/SplineApplication/Sources/SplineApplication/ApplicationBootstrap.swift`
+- `Packages/SplineApplication/Sources/SplineApplication/ConversionOrchestrator.swift`
+- `Packages/SplineApplication/Tests/SplineApplicationTests/SplineApplicationTests.swift`
+- `docs/reviews/phase-3-review.md`
+- `docs/reviews/phase-5-review.md`
+- `docs/reviews/phase-6-review.md`
+- `sessions.md`
+
+### Tests / verification
+- Command: `scripts/run-quality-gates.sh`
+- Result: Pass
+- Command: `node ~/.pi/agent/zero-debt/scripts/zero-debt-verify.mjs`
+- Result: Pass
+
+### Risks found
+1. EPS and SVG source rasterization are not yet implemented and currently return unsupported errors.
+2. Homebrew dylib deployment-target warnings remain for local macOS toolchain linkage.
+
+### Open questions created or updated
+- O-004 remains open and now directly impacts EPS roadmap completion.
+
+### Next recommended actions
+1. Implement EPS source rendering path and SVG source rasterization path.
+2. Expand matrix tests for PDF/RAW/WebP/AVIF combinations and animation policy execution.
+
+## Session 2026-03-12 16:27 GMT+10
+
+### Participants
+- Human: Product Owner
+- Agent: Coding Assistant
+
+### Objectives
+1. Execute requested sequence: EPS path, SVG source rasterization, matrix test expansion, app target wiring.
+
+### Actions performed
+1. Added EPS decode path in conversion engine with typed decode-failure behavior.
+2. Added SVG rasterization service and integrated SVG source conversion for raster targets.
+3. Added matrix conversion tests (WebP/AVIF paths) and animation planning coverage test.
+4. Added concrete iOS and macOS SwiftUI app targets and XcodeGen project spec.
+5. Added step-by-step review documents for each requested item.
+6. Ran strict lint/tests/zero-debt verification.
+
+### Decisions made
+1. SVG rasterizer currently supports canvas attributes and rectangle primitives for deterministic fallback.
+2. App targets are source-complete and generation-ready via XcodeGen.
+
+### Files changed
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionServiceTests.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGRasterizer.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGConversionService.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/MatrixConversionTests.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/SplineConversionEngineTests.swift`
+- `Apps/Spline-iOS/Sources/SplineiOSApp.swift`
+- `Apps/Spline-macOS/Sources/SplinemacOSApp.swift`
+- `Apps/project.yml`
+- `Apps/README.md`
+- `docs/reviews/step-1-eps-path-review.md`
+- `docs/reviews/step-2-svg-rasterization-review.md`
+- `docs/reviews/step-3-matrix-and-animation-review.md`
+- `docs/reviews/step-4-app-target-wiring-review.md`
+- `sessions.md`
+
+### Tests / verification
+- Command: `scripts/run-quality-gates.sh`
+- Result: Pass
+- Command: `node ~/.pi/agent/zero-debt/scripts/zero-debt-verify.mjs`
+- Result: Pass
+
+### Risks found
+1. SVG rasterization currently covers a focused subset of SVG primitives; richer SVG support remains to be implemented.
+2. Local linkage warning persists for Homebrew dynamic libs built with newer SDK target.
+
+### Open questions created or updated
+- O-004 continues to affect EPS parity expectations across platforms.
+
+### Next recommended actions
+1. Extend SVG rasterizer support to additional primitives and path data.
+2. Expand EPS rendering fallback strategy for broader compatibility.
+3. Wire iPadOS app target in generated app project with keyboard and files workflows.
+
+## Session 2026-03-12 16:55 GMT+10
+
+### Participants
+- Human: Product Owner
+- Agent: Coding Assistant
+
+### Objectives
+1. Execute requested items 1-3 sequentially: richer SVG raster support, EPS fallback, iPadOS/files wiring.
+
+### Actions performed
+1. Expanded SVG rasterizer to support `rect`, `circle`, `line`, and basic `path` commands (`M`, `L`, `Z`).
+2. Refactored SVG parsing into dedicated parser module for maintainability.
+3. Added tiered EPS decoding fallback path (ImageIO, Core Image, macOS `sips` conversion fallback).
+4. Added iPadOS app target wiring and Files integration conversion flow (`fileImporter` + conversion + `fileExporter`).
+5. Added targeted review documents for each requested item.
+6. Ran strict quality gates and zero-debt verification.
+
+### Decisions made
+1. SVG parser remains deterministic and intentionally scoped to core primitives while remaining extendable.
+2. EPS fallback prioritizes native decode paths before process-based conversion fallback.
+3. iPadOS target uses explicit app target with device-family-specific wiring.
+
+### Files changed
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGRasterizer.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGDocumentParser.swift`
+- `Packages/SplineVectorization/Tests/SplineVectorizationTests/SVGRasterizerTests.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService.swift`
+- `Apps/Spline-iOS/Sources/FileConversionFlowView.swift`
+- `Apps/Spline-iOS/Sources/SplineiOSApp.swift`
+- `Apps/Spline-iPadOS/Sources/SplineiPadOSApp.swift`
+- `Apps/project.yml`
+- `Apps/README.md`
+- `docs/reviews/next-1-svg-primitives-review.md`
+- `docs/reviews/next-2-eps-fallback-review.md`
+- `docs/reviews/next-3-ipados-files-flow-review.md`
+- `sessions.md`
+
+### Tests / verification
+- Command: `scripts/run-quality-gates.sh`
+- Result: Pass
+- Command: `node ~/.pi/agent/zero-debt/scripts/zero-debt-verify.mjs`
+- Result: Pass
+
+### Risks found
+1. SVG path support currently covers core path commands and should be expanded for full SVG path grammar.
+2. EPS fallback via `sips` is macOS-specific and needs platform-specific strategy for non-macOS targets.
+
+### Open questions created or updated
+- O-004 remains open for final EPS parity contract.
+
+### Next recommended actions
+1. Expand SVG path grammar support (curves, arcs, relative multi-segment paths).
+2. Add iPadOS keyboard interaction tests and Files workflow integration tests at app layer.
+
+## Session 2026-03-12 19:32 GMT+10
+
+### Participants
+- Human: Product Owner
+- Agent: Coding Assistant
+
+### Objectives
+1. Continue SVG grammar depth implementation for path parsing and rendering.
+
+### Actions performed
+1. Added dedicated `SVGPathDataParser` module for tokenized SVG path parsing.
+2. Expanded path command support to include `H/V/C/S/Q/T/A` and relative variants.
+3. Updated rasterizer rendering to draw cubic and quadratic curves.
+4. Kept deterministic arc fallback behavior by mapping arc segments to endpoint lines.
+5. Ran strict lint/tests/zero-debt verification.
+
+### Decisions made
+1. Arc command support currently prioritizes stable endpoint interpretation over full elliptical arc tessellation.
+
+### Files changed
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGDocumentParser.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGPathDataParser.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGRasterizer.swift`
+- `docs/reviews/next-1-svg-primitives-review.md`
+- `sessions.md`
+
+### Tests / verification
+- Command: `scripts/run-quality-gates.sh`
+- Result: Pass
+- Command: `node ~/.pi/agent/zero-debt/scripts/zero-debt-verify.mjs`
+- Result: Pass
+
+### Risks found
+1. Full geometric elliptical arc reconstruction is still a targeted future enhancement.
+
+### Next recommended actions
+1. Implement full elliptical arc reconstruction for `A/a` commands.
+2. Add additional SVG path conformance fixtures for mixed command streams.

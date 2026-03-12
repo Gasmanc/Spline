@@ -1,0 +1,68 @@
+name: Spline
+options:
+  bundleIdPrefix: com.gasmanc
+configs:
+  Debug: debug
+  Release: release
+packages:
+  SplineApplication:
+    path: ../Packages/SplineApplication
+  SplineUI:
+    path: ../Packages/SplineUI
+  SplineStorage:
+    path: ../Packages/SplineStorage
+  SplineConversionEngine:
+    path: ../Packages/SplineConversionEngine
+  SplineDomain:
+    path: ../Packages/SplineDomain
+targets:
+  Spline-iOS:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - Spline-iOS/Sources
+    dependencies:
+      - package: SplineApplication
+      - package: SplineUI
+      - package: SplineStorage
+      - package: SplineConversionEngine
+      - package: SplineDomain
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gasmanc.spline.ios
+        PRODUCT_NAME: Spline
+        SWIFT_VERSION: 5.10
+        TARGETED_DEVICE_FAMILY: 1
+  Spline-iPadOS:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - Spline-iPadOS/Sources
+      - Spline-iOS/Sources/FileConversionFlowView.swift
+    dependencies:
+      - package: SplineApplication
+      - package: SplineUI
+      - package: SplineStorage
+      - package: SplineConversionEngine
+      - package: SplineDomain
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gasmanc.spline.ipados
+        PRODUCT_NAME: Spline
+        SWIFT_VERSION: 5.10
+        TARGETED_DEVICE_FAMILY: 2
+  Spline-macOS:
+    type: application
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - Spline-macOS/Sources
+    dependencies:
+      - package: SplineUI
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gasmanc.spline.macos
+        PRODUCT_NAME: Spline
+        SWIFT_VERSION: 5.10

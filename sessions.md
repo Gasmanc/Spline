@@ -55,9 +55,9 @@ Authoritative source:
 
 | Date | Dependency | Intended Use | License | Decision | Notes |
 |------|------------|--------------|---------|----------|-------|
-| 2026-03-11 | libwebp | WebP decode/encode | BSD-3-Clause | Candidate Accepted Pending Verification | Validate exact version and NOTICE requirements |
-| 2026-03-11 | libavif | AVIF decode/encode | BSD-2-Clause | Candidate Accepted Pending Verification | Validate transitive dependencies |
-| 2026-03-11 | Vector tracer candidate (vtracer bridge) | Color-capable raster-to-vector | Expected permissive | Pending | License and App Store distribution check required |
+| 2026-03-11 | libwebp | WebP decode/encode | BSD-3-Clause | Locked | Integrated via `CWebPBridge` |
+| 2026-03-11 | libavif | AVIF decode/encode | BSD-2-Clause | Locked | Integrated via `CAVIFBridge` |
+| 2026-03-12 | vtracer | Color-capable raster-to-vector | MIT OR Apache-2.0 | Locked | Integrated via `ExternalVTracerService` |
 
 ---
 
@@ -214,3 +214,63 @@ Authoritative source:
 ### Next recommended actions
 1. Apply documented branch protection settings in GitHub repository configuration.
 2. Begin Phase 1 dependency candidate lock and legal validation workflow.
+
+## Session 2026-03-12 15:25 GMT+10
+
+### Participants
+- Human: Product Owner
+- Agent: Coding Assistant
+
+### Objectives
+1. Integrate approved permissive external codec and tracing dependencies.
+2. Keep strict lint, test, and zero-debt compliance.
+
+### Actions performed
+1. Installed and integrated `libwebp` and `libavif` through C bridge targets in `SplineConversionEngine`.
+2. Implemented external codec Swift bridge and wired WebP/AVIF encode/decode into runtime service.
+3. Added round-trip tests for WebP and AVIF.
+4. Installed and integrated `vtracer` via `ExternalVTracerService` in `SplineVectorization`.
+5. Added SVG conversion integration test and retained deterministic internal fallback path.
+6. Updated CI workflow to install codec dependencies.
+7. Updated dependency lock, notices, and dependency report.
+8. Updated phase review docs and executed full strict quality gates.
+
+### Decisions made
+1. External codec integration uses native C bridges with fail-closed behavior when unavailable.
+2. External tracer integration is attempted first on supported raster formats with deterministic internal fallback.
+
+### Files changed
+- `.github/workflows/ci.yml`
+- `DEPENDENCIES.md`
+- `THIRD_PARTY_NOTICES.md`
+- `dependency-report.json`
+- `Packages/SplineConversionEngine/Package.swift`
+- `Packages/SplineConversionEngine/Sources/CWebPBridge/*`
+- `Packages/SplineConversionEngine/Sources/CAVIFBridge/*`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/ExternalCodecBridge.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/ImageIOCodecService.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/ExternalCodecBridgeTests.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/ExternalVTracerService.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGConversionService.swift`
+- `Packages/SplineVectorization/Tests/SplineVectorizationTests/SVGConversionServiceTests.swift`
+- `docs/reviews/phase-1-review.md`
+- `docs/reviews/phase-3-review.md`
+- `docs/reviews/phase-4-review.md`
+- `sessions.md`
+
+### Tests / verification
+- Command: `scripts/run-quality-gates.sh`
+- Result: Pass
+- Command: `node ~/.pi/agent/zero-debt/scripts/zero-debt-verify.mjs`
+- Result: Pass
+
+### Risks found
+1. macOS linker emits deployment-target warnings for Homebrew dylibs built against newer SDK version.
+2. iOS packaging of third-party native codecs needs dedicated build and distribution strategy before app target release.
+
+### Open questions created or updated
+- O-004 remains open for EPS parity strategy across platforms.
+
+### Next recommended actions
+1. Implement app-target integration and end-to-end conversion workflows using new codec and tracing services.
+2. Add matrix integration tests for additional format pairs and animation policy paths.

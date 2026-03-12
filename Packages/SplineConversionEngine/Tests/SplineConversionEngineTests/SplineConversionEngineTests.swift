@@ -34,6 +34,20 @@ final class SplineConversionEngineTests: XCTestCase {
         XCTAssertEqual(plan.steps, [.decodeRaster, .traceRasterToSVG, .normalizeColor, .encodeVector, .stripMetadata])
     }
 
+    func testPlannerIncludesAnimationSelectionStepWhenInputMarkedAnimated() throws {
+        let planner = ConversionGraphPlanner()
+        let intent = ConversionIntent(
+            sourceFormat: .gif,
+            targetFormat: .png,
+            containsAlphaChannel: false,
+            containsAnimation: true,
+            options: ConversionOptions(outputColorSpace: .sRGB)
+        )
+
+        let plan = planner.plan(for: intent)
+        XCTAssertTrue(plan.steps.contains(.selectAnimationFrames))
+    }
+
     func testPlanScorerRewardsVectorPreservation() throws {
         let planner = ConversionGraphPlanner()
         let intent = ConversionIntent(

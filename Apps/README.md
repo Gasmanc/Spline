@@ -1,6 +1,16 @@
 # App Targets
 
-- `Spline-iOS`: iOS/iPadOS application target (SwiftUI-first)
-- `Spline-macOS`: macOS application target (SwiftUI + AppKit bridges where required)
+This directory contains concrete app target source code and an XcodeGen project spec.
 
-These targets will be created in Xcode project/workspace during Phase 1/2 once dependency lock and deployment target decisions are finalized.
+## Targets
+- `Spline-iOS` (iOS/iPadOS SwiftUI app)
+- `Spline-macOS` (macOS SwiftUI app with keyboard command wiring)
+
+## Generate Xcode project
+1. Install XcodeGen (`brew install xcodegen`)
+2. Run from `Apps/`:
+   - `xcodegen generate`
+
+## Notes
+- App sources are wired to package modules: `SplineApplication`, `SplineUI`, `SplineStorage`.
+- Production signing, capabilities, and App Store metadata configuration are completed at release staging.

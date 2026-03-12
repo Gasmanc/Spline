@@ -1,0 +1,42 @@
+name: Spline
+options:
+  bundleIdPrefix: com.gasmanc
+configs:
+  Debug: debug
+  Release: release
+packages:
+  SplineApplication:
+    path: ../Packages/SplineApplication
+  SplineUI:
+    path: ../Packages/SplineUI
+  SplineStorage:
+    path: ../Packages/SplineStorage
+targets:
+  Spline-iOS:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - Spline-iOS/Sources
+    dependencies:
+      - package: SplineApplication
+      - package: SplineUI
+      - package: SplineStorage
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gasmanc.spline.ios
+        PRODUCT_NAME: Spline
+        SWIFT_VERSION: 5.10
+  Spline-macOS:
+    type: application
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - Spline-macOS/Sources
+    dependencies:
+      - package: SplineUI
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gasmanc.spline.macos
+        PRODUCT_NAME: Spline
+        SWIFT_VERSION: 5.10

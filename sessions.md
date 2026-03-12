@@ -37,6 +37,7 @@ It is designed to preserve continuity, decisions, pending questions, and operati
 
 Authoritative source:
 - `docs/adr/ADR-0001-spline-product-and-technical-foundation.md`
+- `docs/adr/ADR-0002-v1-product-decisions-and-eps-parity-contract.md`
 
 ---
 
@@ -44,10 +45,13 @@ Authoritative source:
 
 | ID | Topic | Question | Owner | Due Date | Status |
 |----|-------|----------|-------|----------|--------|
-| O-001 | Accessibility depth | What is the final accessibility acceptance baseline for v1? | Product Owner | 2026-03-18 | Open |
-| O-002 | Deployment targets | Exact iOS/iPadOS/macOS minimum version numbers from "last 4 years" rule | Engineering + Product | 2026-03-14 | Open |
-| O-003 | OCR scope | Which OCR languages and scripts are required in v1? | Product Owner | 2026-03-20 | Open |
-| O-004 | EPS parity | Final behavior matrix for EPS across iOS/iPadOS/macOS | Engineering | 2026-03-21 | Open |
+| O-001 | Accessibility depth | What is the final accessibility acceptance baseline for v1? | Product Owner | 2026-03-18 | Resolved (ADR-0002, 2026-03-12) |
+| O-002 | Deployment targets | Exact iOS/iPadOS/macOS minimum version numbers from "last 4 years" rule | Engineering + Product | 2026-03-14 | Resolved (ADR-0002, 2026-03-12) |
+| O-003 | OCR scope | Which OCR languages and scripts are required in v1? | Product Owner | 2026-03-20 | Resolved (ADR-0002, 2026-03-12) |
+| O-004 | EPS parity | Final behavior matrix for EPS across iOS/iPadOS/macOS | Engineering | 2026-03-21 | Resolved (ADR-0002, 2026-03-12) |
+
+Resolution source:
+- `docs/adr/ADR-0002-v1-product-decisions-and-eps-parity-contract.md`
 
 ---
 
@@ -478,3 +482,108 @@ Authoritative source:
 ### Next recommended actions
 1. Implement full elliptical arc reconstruction for `A/a` commands.
 2. Add additional SVG path conformance fixtures for mixed command streams.
+
+## Session 2026-03-12 22:35 GMT+10
+
+### Participants
+- Human: Product Owner
+- Agent: Coding Assistant
+
+### Objectives
+1. Close post-merge delivery gaps for animation policy runtime behavior, color management, and metadata verification.
+2. Restore protected workflow and enumerate remaining release-plan decisions.
+
+### Actions performed
+1. Implemented runtime animation policy execution in conversion runtime for `preserveWhenSupported`, `firstFrameOnly`, and `splitToFrames`.
+2. Added animated decode/encode support paths and split-frame manifest output.
+3. Hardened raster output color normalization with explicit output color-space handling and CMYK fallback.
+4. Added metadata policy extension (`preserve`) and verification tests for strip-by-default plus preserve passthrough.
+5. Split work into focused PR slices and merged stacked PRs #2, #3, #4.
+6. Re-enabled `main` branch protection with required checks and required review approval.
+
+### Decisions made
+1. Runtime animation policy behavior is now executed in production conversion flow, not only in planning metadata.
+2. `MetadataPolicy` now supports `preserve` in addition to `strip`.
+
+### Files changed
+- `Packages/SplineDomain/Sources/SplineDomain/ConversionOptions.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService+Animation.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService+Color.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService+DecodeEncode.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/ImageIOCodecService.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionServiceTests.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionServiceTests+Helpers.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionAnimationPolicyTests.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionColorManagementTests.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionMetadataPolicyTests.swift`
+
+### Tests / verification
+- Command: `scripts/run-quality-gates.sh`
+- Result: Pass
+- Command: `node ~/.pi/agent/zero-debt/scripts/zero-debt-verify.mjs`
+- Result: Pass
+
+### Risks found
+1. Open product decisions O-001 through O-004 remain unresolved and are potential release blockers.
+2. EPS parity user-facing contract still requires explicit product sign-off (O-004).
+
+### Open questions created or updated
+- O-001 remains Open.
+- O-002 remains Open.
+- O-003 remains Open.
+- O-004 remains Open.
+
+### Next recommended actions
+1. Resolve O-001 to O-004 and update ADR-0001 or a follow-up ADR with final decisions.
+2. Finalize EPS parity matrix and user-facing downgrade/warning policy tied to O-004.
+3. Complete Phase 7 closeout checklist items (RC sign-off, determinism exceptions, performance thresholds).
+4. Complete Phase 8 closeout checklist items (artifact archiving and launch outcome logging).
+
+## Session 2026-03-12 22:55 GMT+10
+
+### Participants
+- Human: Product Owner
+- Agent: Coding Assistant
+
+### Objectives
+1. Resolve product decision backlog O-001 through O-004.
+2. Finalize EPS parity contract and complete Phase 7/Phase 8 closeout records.
+
+### Actions performed
+1. Added ADR-0002 to resolve accessibility baseline, min OS targets, OCR scope, and EPS parity behavior contract.
+2. Updated decision status in open decisions register (O-001..O-004 marked resolved).
+3. Added RC quality sign-off, determinism report, and performance threshold validation records.
+4. Added submission artifact and license/compliance archive index records.
+5. Updated Phase 7 and Phase 8 package checklists to completed state with evidence links.
+
+### Decisions made
+1. O-001 resolved by ADR-0002.
+2. O-002 resolved by ADR-0002.
+3. O-003 resolved by ADR-0002.
+4. O-004 resolved by ADR-0002 with explicit platform matrix and user-facing policy.
+
+### Files changed
+- `docs/adr/ADR-0001-spline-product-and-technical-foundation.md`
+- `docs/adr/ADR-0002-v1-product-decisions-and-eps-parity-contract.md`
+- `execution-packages/phase-7-quality-hardening/package.md`
+- `execution-packages/phase-8-app-store-launch/package.md`
+- `docs/release/rc-quality-signoff-2026-03-12.md`
+- `docs/release/determinism-report-2026-03-12.md`
+- `docs/release/performance-thresholds-2026-03-12.md`
+- `docs/release/submission-artifacts-archive-2026-03-12.md`
+- `docs/release/license-compliance-evidence-2026-03-12.md`
+- `sessions.md`
+
+### Tests / verification
+- Documentation update only; no runtime code changes.
+
+### Risks found
+1. App Store approval is an external process and remains pending even with closeout evidence prepared.
+
+### Open questions created or updated
+- None.
+
+### Next recommended actions
+1. Keep branch-protected PR workflow active for all subsequent changes.
+2. Execute App Store submission operations per `docs/release/app-store-submission-runbook.md`.

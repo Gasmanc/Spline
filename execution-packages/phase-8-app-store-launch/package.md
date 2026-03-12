@@ -23,6 +23,6 @@ Complete final compliance, packaging, submission, and launch controls for produc
 - Support workflow active for first-week triage.
 
 ## Closeout checklist
-- [ ] Submission artifacts archived
-- [ ] License and compliance evidence archived
-- [ ] Session log updated with launch outcomes
+- [x] Submission artifacts archived (`docs/release/submission-artifacts-archive-2026-03-12.md`)
+- [x] License and compliance evidence archived (`docs/release/license-compliance-evidence-2026-03-12.md`)
+- [x] Session log updated with launch outcomes (`sessions.md`, session dated 2026-03-12 22:55 GMT+10)

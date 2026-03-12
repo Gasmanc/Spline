@@ -23,6 +23,6 @@ Drive release candidate quality through aggressive regression, determinism, reli
 - Performance goals met for representative workloads.
 
 ## Handoff checklist to Phase 8
-- [ ] RC sign-off complete
-- [ ] Determinism exceptions documented
-- [ ] Performance thresholds validated
+- [x] RC sign-off complete (`docs/release/rc-quality-signoff-2026-03-12.md`)
+- [x] Determinism exceptions documented (`docs/release/determinism-report-2026-03-12.md`)
+- [x] Performance thresholds validated (`docs/release/performance-thresholds-2026-03-12.md`)

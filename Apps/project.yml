@@ -11,6 +11,10 @@ packages:
     path: ../Packages/SplineUI
   SplineStorage:
     path: ../Packages/SplineStorage
+  SplineConversionEngine:
+    path: ../Packages/SplineConversionEngine
+  SplineDomain:
+    path: ../Packages/SplineDomain
 targets:
   Spline-iOS:
     type: application
@@ -22,11 +26,33 @@ targets:
       - package: SplineApplication
       - package: SplineUI
       - package: SplineStorage
+      - package: SplineConversionEngine
+      - package: SplineDomain
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.gasmanc.spline.ios
         PRODUCT_NAME: Spline
         SWIFT_VERSION: 5.10
+        TARGETED_DEVICE_FAMILY: 1
+  Spline-iPadOS:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - Spline-iPadOS/Sources
+      - Spline-iOS/Sources/FileConversionFlowView.swift
+    dependencies:
+      - package: SplineApplication
+      - package: SplineUI
+      - package: SplineStorage
+      - package: SplineConversionEngine
+      - package: SplineDomain
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.gasmanc.spline.ipados
+        PRODUCT_NAME: Spline
+        SWIFT_VERSION: 5.10
+        TARGETED_DEVICE_FAMILY: 2
   Spline-macOS:
     type: application
     platform: macOS

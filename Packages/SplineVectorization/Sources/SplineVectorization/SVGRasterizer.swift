@@ -14,7 +14,22 @@ public struct SVGRasterizer: Sendable {
             throw SVGTraceError.decodeFailed
         }
 
-        let canvas = parserDelegate.canvasSize
+        let context = try makeContext(canvas: parserDelegate.canvasSize)
+        clearCanvas(context, canvas: parserDelegate.canvasSize)
+
+        drawRectangles(parserDelegate.rectangles, context: context)
+        drawCircles(parserDelegate.circles, context: context)
+        drawLines(parserDelegate.lines, context: context)
+        drawPaths(parserDelegate.paths, context: context)
+
+        guard let image = context.makeImage() else {
+            throw SVGTraceError.decodeFailed
+        }
+
+        return image
+    }
+
+    private func makeContext(canvas: SVGCanvasSize) throws -> CGContext {
         let width = max(canvas.width, 1)
         let height = max(canvas.height, 1)
 
@@ -30,12 +45,25 @@ public struct SVGRasterizer: Sendable {
             throw SVGTraceError.decodeFailed
         }
 
-        context.setFillColor(red: 1, green: 1, blue: 1, alpha: 0)
-        context.fill(CGRect(x: 0, y: 0, width: width, height: height))
+        return context
+    }
 
-        for rectangle in parserDelegate.rectangles {
-            let color = parseHexColor(rectangle.fillHex)
-            context.setFillColor(red: color.red, green: color.green, blue: color.blue, alpha: color.alpha)
+    private func clearCanvas(_ context: CGContext, canvas: SVGCanvasSize) {
+        context.setFillColor(red: 1, green: 1, blue: 1, alpha: 0)
+        context.fill(
+            CGRect(
+                x: 0,
+                y: 0,
+                width: max(canvas.width, 1),
+                height: max(canvas.height, 1)
+            )
+        )
+    }
+
+    private func drawRectangles(_ rectangles: [SVGRectangle], context: CGContext) {
+        for rectangle in rectangles {
+            let fillColor = parseHexColor(rectangle.fillHex)
+            context.setFillColor(red: fillColor.red, green: fillColor.green, blue: fillColor.blue, alpha: fillColor.alpha)
             context.fill(
                 CGRect(
                     x: rectangle.originX,
@@ -45,12 +73,65 @@ public struct SVGRasterizer: Sendable {
                 )
             )
         }
+    }
 
-        guard let image = context.makeImage() else {
-            throw SVGTraceError.decodeFailed
+    private func drawCircles(_ circles: [SVGCircle], context: CGContext) {
+        for circle in circles {
+            let fillColor = parseHexColor(circle.fillHex)
+            context.setFillColor(red: fillColor.red, green: fillColor.green, blue: fillColor.blue, alpha: fillColor.alpha)
+            let rect = CGRect(
+                x: circle.centerX - circle.radius,
+                y: circle.centerY - circle.radius,
+                width: circle.radius * 2,
+                height: circle.radius * 2
+            )
+            context.fillEllipse(in: rect)
+        }
+    }
+
+    private func drawLines(_ lines: [SVGLine], context: CGContext) {
+        for line in lines {
+            let strokeColor = parseHexColor(line.strokeHex)
+            context.setStrokeColor(red: strokeColor.red, green: strokeColor.green, blue: strokeColor.blue, alpha: strokeColor.alpha)
+            context.setLineWidth(max(line.strokeWidth, 1))
+            context.beginPath()
+            context.move(to: CGPoint(x: line.startX, y: line.startY))
+            context.addLine(to: CGPoint(x: line.endX, y: line.endY))
+            context.strokePath()
+        }
+    }
+
+    private func drawPaths(_ paths: [SVGPathShape], context: CGContext) {
+        for path in paths {
+            draw(path: path, context: context)
+        }
+    }
+
+    private func draw(path: SVGPathShape, context: CGContext) {
+        let fillColor = parseHexColor(path.fillHex)
+        let strokeColor = parseHexColor(path.strokeHex)
+
+        context.beginPath()
+        for command in path.commands {
+            switch command {
+            case let .moveTo(point):
+                context.move(to: point)
+            case let .lineTo(point):
+                context.addLine(to: point)
+            case .close:
+                context.closePath()
+            }
         }
 
-        return image
+        context.setFillColor(red: fillColor.red, green: fillColor.green, blue: fillColor.blue, alpha: fillColor.alpha)
+        context.setStrokeColor(red: strokeColor.red, green: strokeColor.green, blue: strokeColor.blue, alpha: strokeColor.alpha)
+        context.setLineWidth(max(path.strokeWidth, 1))
+
+        if path.hasFill {
+            context.drawPath(using: .fillStroke)
+        } else {
+            context.drawPath(using: .stroke)
+        }
     }
 
     private func parseHexColor(_ hex: String) -> RGBAColor {
@@ -71,72 +152,4 @@ private struct RGBAColor {
     let green: CGFloat
     let blue: CGFloat
     let alpha: CGFloat
-}
-
-private final class SVGDocumentParser: NSObject, XMLParserDelegate {
-    struct Rectangle {
-        let originX: CGFloat
-        let originY: CGFloat
-        let width: CGFloat
-        let height: CGFloat
-        let fillHex: String
-    }
-
-    struct CanvasSize {
-        let width: Int
-        let height: Int
-    }
-
-    var canvasSize = CanvasSize(width: 512, height: 512)
-    var rectangles: [Rectangle] = []
-
-    func parser(
-        _ parser: XMLParser,
-        didStartElement elementName: String,
-        namespaceURI: String?,
-        qualifiedName qName: String?,
-        attributes attributeDict: [String: String] = [:]
-    ) {
-        _ = namespaceURI
-        _ = qName
-        _ = parser
-
-        if elementName == "svg" {
-            let width = Int(parseLength(attributeDict["width"]) ?? 512)
-            let height = Int(parseLength(attributeDict["height"]) ?? 512)
-            canvasSize = CanvasSize(width: max(width, 1), height: max(height, 1))
-            return
-        }
-
-        if elementName == "rect" {
-            let originX = parseLength(attributeDict["x"]) ?? 0
-            let originY = parseLength(attributeDict["y"]) ?? 0
-            let width = parseLength(attributeDict["width"]) ?? 0
-            let height = parseLength(attributeDict["height"]) ?? 0
-            let fill = attributeDict["fill"] ?? "#000000"
-
-            rectangles.append(
-                Rectangle(
-                    originX: originX,
-                    originY: originY,
-                    width: width,
-                    height: height,
-                    fillHex: fill
-                )
-            )
-        }
-    }
-
-    private func parseLength(_ value: String?) -> CGFloat? {
-        guard let value else {
-            return nil
-        }
-
-        let filtered = value.filter { "0123456789.".contains($0) }
-        guard let number = Double(filtered) else {
-            return nil
-        }
-
-        return CGFloat(number)
-    }
 }

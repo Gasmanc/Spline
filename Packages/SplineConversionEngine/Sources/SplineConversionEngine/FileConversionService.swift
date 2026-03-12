@@ -136,13 +136,69 @@ public struct FileConversionService: Sendable {
     }
 
     private func decodeEPS(_ inputURL: URL) throws -> CGImage {
-        guard let source = CGImageSourceCreateWithURL(inputURL as CFURL, nil),
+        if let source = CGImageSourceCreateWithURL(inputURL as CFURL, nil),
+           let image = CGImageSourceCreateImageAtIndex(source, 0, nil) {
+            return image
+        }
+
+        if let ciImage = CIImage(contentsOf: inputURL) {
+            let context = CIContext(options: [
+                CIContextOption.priorityRequestLow: false,
+                CIContextOption.outputPremultiplied: true
+            ])
+            if let image = context.createCGImage(ciImage, from: ciImage.extent) {
+                return image
+            }
+        }
+
+        #if os(macOS)
+        if let fallback = try decodeEPSUsingSIPS(inputURL) {
+            return fallback
+        }
+        #endif
+
+        throw ConversionEngineError.decodeFailed
+    }
+
+    #if os(macOS)
+    private func decodeEPSUsingSIPS(_ inputURL: URL) throws -> CGImage? {
+        let tempDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("spline-eps-fallback", isDirectory: true)
+        try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
+
+        let outputURL = tempDirectory.appendingPathComponent("\(UUID().uuidString).png")
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/sips")
+        process.arguments = ["-s", "format", "png", inputURL.path, "--out", outputURL.path]
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+        } catch {
+            return nil
+        }
+
+        guard process.terminationStatus == 0 else {
+            return nil
+        }
+
+        defer {
+            do {
+                try FileManager.default.removeItem(at: outputURL)
+            } catch {
+                _ = error
+            }
+        }
+
+        guard let source = CGImageSourceCreateWithURL(outputURL as CFURL, nil),
               let image = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
-            throw ConversionEngineError.decodeFailed
+            return nil
         }
 
         return image
     }
+    #endif
 
     private func encodePDF(_ image: CGImage, outputURL: URL) throws {
         var mediaBox = CGRect(x: 0, y: 0, width: image.width, height: image.height)

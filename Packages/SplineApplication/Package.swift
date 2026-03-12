@@ -10,8 +10,22 @@ let package = Package(
     products: [
         .library(name: "SplineApplication", targets: ["SplineApplication"])
     ],
+    dependencies: [
+        .package(path: "../SplineDomain"),
+        .package(path: "../SplineConversionEngine"),
+        .package(path: "../SplineJobs"),
+        .package(path: "../SplineStorage")
+    ],
     targets: [
-        .target(name: "SplineApplication"),
+        .target(
+            name: "SplineApplication",
+            dependencies: [
+                .product(name: "SplineDomain", package: "SplineDomain"),
+                .product(name: "SplineConversionEngine", package: "SplineConversionEngine"),
+                .product(name: "SplineJobs", package: "SplineJobs"),
+                .product(name: "SplineStorage", package: "SplineStorage")
+            ]
+        ),
         .testTarget(name: "SplineApplicationTests", dependencies: ["SplineApplication"])
     ]
 )

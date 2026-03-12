@@ -1,23 +1,23 @@
 # Phase 6 Code Review
 
 ## Scope reviewed
-- Conversion form model
-- SwiftUI conversion form view
-- Keyboard commands for conversion action
+- Application orchestration layer
+- Job queue integration with conversion engine
+- History recording for success and failure outcomes
 
 ## Quality review
-1. Form model generates domain intents without UI leakage.
-2. SwiftUI view uses strongly typed selections for formats and options.
-3. Keyboard shortcut command is explicit and discoverable.
-4. Test validates intent construction path.
+1. Orchestration is actor-isolated and concurrency-safe.
+2. Queue transitions and history writes are consistent for both success and failure.
+3. Bootstrap assembly centralizes dependency construction.
+4. Integration test verifies enqueue/process/history end-to-end behavior.
 
-## Maintainability review
-1. UI state and domain intent conversion are separated.
-2. Options are represented by domain enums instead of stringly typed values.
+## Edge case review
+1. Failure path records error message and updates queue state.
+2. Success path ensures output artifact and history outcome consistency.
 
-## Accessibility review
-1. Labels are explicit for picker controls.
-2. Keyboard command support is implemented for desktop-class flows.
+## Security review
+1. No telemetry or network operations introduced.
+2. All operations use explicit local file URLs.
 
 ## Review result
 PASS

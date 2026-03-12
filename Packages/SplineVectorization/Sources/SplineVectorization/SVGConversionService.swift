@@ -6,9 +6,14 @@ import SplineDomain
 
 public struct SVGConversionService: Sendable {
     private let tracer: RasterSVGTracer
+    private let externalTracer: ExternalVTracerService
 
-    public init(tracer: RasterSVGTracer = RasterSVGTracer()) {
+    public init(
+        tracer: RasterSVGTracer = RasterSVGTracer(),
+        externalTracer: ExternalVTracerService = ExternalVTracerService()
+    ) {
         self.tracer = tracer
+        self.externalTracer = externalTracer
     }
 
     public func convertToSVG(inputURL: URL, outputURL: URL, intent: ConversionIntent) throws {
@@ -25,6 +30,18 @@ public struct SVGConversionService: Sendable {
             }
         }
 
+        if shouldUseExternalTracer(for: intent.sourceFormat) {
+            let traced = externalTracer.trace(
+                inputURL: inputURL,
+                outputURL: outputURL,
+                mode: intent.options.traceMode,
+                controls: intent.options.traceControls
+            )
+            if traced {
+                return
+            }
+        }
+
         let rasterImage = try decodeImage(inputURL: inputURL, format: intent.sourceFormat)
         let svg = try tracer.trace(image: rasterImage, mode: intent.options.traceMode, controls: intent.options.traceControls)
 
@@ -36,6 +53,15 @@ public struct SVGConversionService: Sendable {
             try outputData.write(to: outputURL, options: .atomic)
         } catch {
             throw SVGTraceError.writeFailed
+        }
+    }
+
+    private func shouldUseExternalTracer(for format: ImageFormat) -> Bool {
+        switch format {
+        case .jpeg, .bmp, .gif, .tiff, .png:
+            return true
+        case .heic, .webp, .raw, .svg, .avif, .hdr, .eps, .pdf:
+            return false
         }
     }
 

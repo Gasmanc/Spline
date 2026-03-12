@@ -329,3 +329,59 @@ Authoritative source:
 ### Next recommended actions
 1. Implement EPS source rendering path and SVG source rasterization path.
 2. Expand matrix tests for PDF/RAW/WebP/AVIF combinations and animation policy execution.
+
+## Session 2026-03-12 16:27 GMT+10
+
+### Participants
+- Human: Product Owner
+- Agent: Coding Assistant
+
+### Objectives
+1. Execute requested sequence: EPS path, SVG source rasterization, matrix test expansion, app target wiring.
+
+### Actions performed
+1. Added EPS decode path in conversion engine with typed decode-failure behavior.
+2. Added SVG rasterization service and integrated SVG source conversion for raster targets.
+3. Added matrix conversion tests (WebP/AVIF paths) and animation planning coverage test.
+4. Added concrete iOS and macOS SwiftUI app targets and XcodeGen project spec.
+5. Added step-by-step review documents for each requested item.
+6. Ran strict lint/tests/zero-debt verification.
+
+### Decisions made
+1. SVG rasterizer currently supports canvas attributes and rectangle primitives for deterministic fallback.
+2. App targets are source-complete and generation-ready via XcodeGen.
+
+### Files changed
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/FileConversionServiceTests.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGRasterizer.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGConversionService.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/MatrixConversionTests.swift`
+- `Packages/SplineConversionEngine/Tests/SplineConversionEngineTests/SplineConversionEngineTests.swift`
+- `Apps/Spline-iOS/Sources/SplineiOSApp.swift`
+- `Apps/Spline-macOS/Sources/SplinemacOSApp.swift`
+- `Apps/project.yml`
+- `Apps/README.md`
+- `docs/reviews/step-1-eps-path-review.md`
+- `docs/reviews/step-2-svg-rasterization-review.md`
+- `docs/reviews/step-3-matrix-and-animation-review.md`
+- `docs/reviews/step-4-app-target-wiring-review.md`
+- `sessions.md`
+
+### Tests / verification
+- Command: `scripts/run-quality-gates.sh`
+- Result: Pass
+- Command: `node ~/.pi/agent/zero-debt/scripts/zero-debt-verify.mjs`
+- Result: Pass
+
+### Risks found
+1. SVG rasterization currently covers a focused subset of SVG primitives; richer SVG support remains to be implemented.
+2. Local linkage warning persists for Homebrew dynamic libs built with newer SDK target.
+
+### Open questions created or updated
+- O-004 continues to affect EPS parity expectations across platforms.
+
+### Next recommended actions
+1. Extend SVG rasterizer support to additional primitives and path data.
+2. Expand EPS rendering fallback strategy for broader compatibility.
+3. Wire iPadOS app target in generated app project with keyboard and files workflows.

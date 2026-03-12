@@ -29,6 +29,28 @@ final class FileConversionServiceTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: outputURL.path))
     }
 
+    func testConvertEPSUsesDedicatedDecodePath() throws {
+        let service = FileConversionService()
+        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+
+        let inputURL = tempDir.appendingPathComponent("in.eps")
+        let outputURL = tempDir.appendingPathComponent("out.png")
+        try Data("%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 10 10\nshowpage\n".utf8).write(to: inputURL)
+
+        let intent = ConversionIntent(
+            sourceFormat: .eps,
+            targetFormat: .png,
+            containsAlphaChannel: false,
+            containsAnimation: false,
+            options: ConversionOptions(outputColorSpace: .sRGB)
+        )
+
+        XCTAssertThrowsError(try service.convert(inputURL: inputURL, outputURL: outputURL, intent: intent)) { error in
+            XCTAssertNotEqual(error as? ConversionEngineError, .unsupportedFormat)
+        }
+    }
+
     func testConvertPNGToPDF() throws {
         let service = FileConversionService()
         let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)

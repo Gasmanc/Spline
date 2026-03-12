@@ -60,7 +60,7 @@ public struct FileConversionService: Sendable {
         case .raw:
             return try DecodedRasterImage(cgImage: decodeRAW(inputURL))
         case .eps:
-            throw ConversionEngineError.unsupportedFormat
+            return try DecodedRasterImage(cgImage: decodeEPS(inputURL))
         case .svg:
             throw ConversionEngineError.unsupportedFormat
         case .jpeg, .bmp, .heic, .webp, .gif, .tiff, .png, .avif, .hdr:
@@ -129,6 +129,15 @@ public struct FileConversionService: Sendable {
         ])
 
         guard let image = context.createCGImage(ciImage, from: ciImage.extent) else {
+            throw ConversionEngineError.decodeFailed
+        }
+
+        return image
+    }
+
+    private func decodeEPS(_ inputURL: URL) throws -> CGImage {
+        guard let source = CGImageSourceCreateWithURL(inputURL as CFURL, nil),
+              let image = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
             throw ConversionEngineError.decodeFailed
         }
 

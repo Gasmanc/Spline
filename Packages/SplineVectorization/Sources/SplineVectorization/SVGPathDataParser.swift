@@ -283,11 +283,11 @@ private func consumeArc(relative: Bool, state: inout SVGPathParseState) -> Bool 
     var consumed = false
 
     while true {
-        guard state.readNumber() != nil,
-              state.readNumber() != nil,
-              state.readNumber() != nil,
-              state.readNumber() != nil,
-              state.readNumber() != nil,
+        guard let radiusX = state.readNumber(),
+              let radiusY = state.readNumber(),
+              let xAxisRotation = state.readNumber(),
+              let largeArcFlag = state.readNumber(),
+              let sweepFlag = state.readNumber(),
               let xValue = state.readNumber(),
               let yValue = state.readNumber() else {
             break
@@ -298,7 +298,18 @@ private func consumeArc(relative: Bool, state: inout SVGPathParseState) -> Bool 
             y: relative ? state.currentPoint.y + yValue : yValue
         )
 
-        state.commands.append(.lineTo(end))
+        let arcInput = SVGArcInput(
+            start: state.currentPoint,
+            end: end,
+            radiusX: radiusX,
+            radiusY: radiusY,
+            xAxisRotationDegrees: xAxisRotation,
+            largeArc: largeArcFlag >= 0.5,
+            sweep: sweepFlag >= 0.5
+        )
+        let arcCommands = SVGArcConverter.commands(for: arcInput)
+
+        state.commands.append(contentsOf: arcCommands)
         state.currentPoint = end
         state.previousCubicControl = nil
         state.previousQuadControl = nil

@@ -25,7 +25,7 @@ struct SVGLine {
     let strokeWidth: CGFloat
 }
 
-enum SVGPathCommand {
+enum SVGPathCommand: Equatable {
     case moveTo(CGPoint)
     case lineTo(CGPoint)
     case cubicCurveTo(control1: CGPoint, control2: CGPoint, end: CGPoint)

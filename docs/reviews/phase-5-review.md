@@ -1,23 +1,23 @@
 # Phase 5 Code Review
 
 ## Scope reviewed
-- Job model and state transitions
-- Persistent job store
-- Actor-based queue operations
+- Storage module persistence implementation
+- Conversion history data model and append/load behavior
+- Application path management
 
 ## Quality review
-1. Queue uses Swift concurrency actor isolation for thread safety.
-2. Persistence is atomic and deterministic using sorted-key JSON encoding.
-3. Job lifecycle transitions are explicit and test-covered.
-4. Progress values are clamped to safe bounds.
+1. History storage uses typed records with immutable identity and explicit outcome.
+2. File persistence is atomic and deterministic using sorted-key JSON.
+3. App path helper centralizes storage location construction.
+4. Async actor isolation ensures thread-safe history access.
 
-## Reliability review
-1. Queue state persists after each mutation.
-2. Restore operation loads persisted jobs for resumable behavior.
+## Edge case review
+1. Missing history file returns empty history rather than failing.
+2. Append path reads current state and writes full updated history atomically.
 
 ## Security review
-1. No network operations.
-2. File writes are atomic.
+1. No network pathways.
+2. Files remain in app-controlled directories.
 
 ## Review result
 PASS

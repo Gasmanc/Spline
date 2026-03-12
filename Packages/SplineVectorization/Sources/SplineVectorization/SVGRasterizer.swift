@@ -118,6 +118,10 @@ public struct SVGRasterizer: Sendable {
                 context.move(to: point)
             case let .lineTo(point):
                 context.addLine(to: point)
+            case let .cubicCurveTo(control1, control2, end):
+                context.addCurve(to: end, control1: control1, control2: control2)
+            case let .quadCurveTo(control, end):
+                context.addQuadCurve(to: end, control: control)
             case .close:
                 context.closePath()
             }

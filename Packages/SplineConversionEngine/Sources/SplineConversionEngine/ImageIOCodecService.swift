@@ -17,7 +17,6 @@ public struct ImageIOCodecService: Sendable {
         .jpeg: UTType.jpeg.identifier,
         .bmp: UTType.bmp.identifier,
         .heic: UTType.heic.identifier,
-        .webp: UTType.webP.identifier,
         .gif: UTType.gif.identifier,
         .tiff: UTType.tiff.identifier,
         .png: UTType.png.identifier
@@ -28,6 +27,16 @@ public struct ImageIOCodecService: Sendable {
     public func decodeRasterImage(at inputURL: URL, as format: ImageFormat) throws -> DecodedRasterImage {
         guard !format.isVector else {
             throw ConversionEngineError.unsupportedFormat
+        }
+
+        if format == .webp {
+            let data = try Data(contentsOf: inputURL)
+            return try ExternalCodecBridge.decodeWebP(data: data)
+        }
+
+        if format == .avif {
+            let data = try Data(contentsOf: inputURL)
+            return try ExternalCodecBridge.decodeAVIF(data: data)
         }
 
         guard let source = CGImageSourceCreateWithURL(inputURL as CFURL, nil) else {
@@ -42,6 +51,18 @@ public struct ImageIOCodecService: Sendable {
     }
 
     public func encodeRasterImage(_ image: DecodedRasterImage, to outputURL: URL, as format: ImageFormat) throws {
+        if format == .webp {
+            let encoded = try ExternalCodecBridge.encodeWebP(image: image)
+            try encoded.write(to: outputURL, options: .atomic)
+            return
+        }
+
+        if format == .avif {
+            let encoded = try ExternalCodecBridge.encodeAVIF(image: image)
+            try encoded.write(to: outputURL, options: .atomic)
+            return
+        }
+
         guard let destinationType = Self.destinationTypeMap[format] else {
             throw ConversionEngineError.unsupportedFormat
         }

@@ -51,6 +51,32 @@ final class FileConversionServiceTests: XCTestCase {
         }
     }
 
+    func testConvertSVGToPNG() throws {
+        let service = FileConversionService()
+        let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+
+        let inputURL = tempDir.appendingPathComponent("in.svg")
+        let outputURL = tempDir.appendingPathComponent("out.png")
+        let svg = """
+        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\">
+          <rect x=\"0\" y=\"0\" width=\"16\" height=\"16\" fill=\"#FF0000\"/>
+        </svg>
+        """
+        try Data(svg.utf8).write(to: inputURL)
+
+        let intent = ConversionIntent(
+            sourceFormat: .svg,
+            targetFormat: .png,
+            containsAlphaChannel: true,
+            containsAnimation: false,
+            options: ConversionOptions(outputColorSpace: .sRGB)
+        )
+
+        _ = try service.convert(inputURL: inputURL, outputURL: outputURL, intent: intent)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: outputURL.path))
+    }
+
     func testConvertPNGToPDF() throws {
         let service = FileConversionService()
         let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)

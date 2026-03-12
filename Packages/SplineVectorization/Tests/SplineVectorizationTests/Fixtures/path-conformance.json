@@ -1,0 +1,24 @@
+{
+  "cases": [
+    {
+      "id": "mixed-relative-absolute-arc-quad-close",
+      "pathData": "M 4 4 l 6 0 L 12 6 a 4 3 30 0 1 8 4 q 2 2 4 0 t 4 -2 z",
+      "expectedMove": { "x": 4, "y": 4 },
+      "expectedFinalPoint": { "x": 4, "y": 4 },
+      "minimumLineCount": 2,
+      "minimumCubicCount": 1,
+      "minimumQuadCount": 2,
+      "expectsClose": true
+    },
+    {
+      "id": "chained-arcs-and-smooth-cubic",
+      "pathData": "M 10 10 A 6 4 0 1 1 22 10 a 6 4 0 1 1 12 0 S 38 16 44 10",
+      "expectedMove": { "x": 10, "y": 10 },
+      "expectedFinalPoint": { "x": 44, "y": 10 },
+      "minimumLineCount": 0,
+      "minimumCubicCount": 3,
+      "minimumQuadCount": 0,
+      "expectsClose": false
+    }
+  ]
+}

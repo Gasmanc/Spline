@@ -10,8 +10,16 @@ let package = Package(
     products: [
         .library(name: "SplineStorage", targets: ["SplineStorage"])
     ],
+    dependencies: [
+        .package(path: "../SplineDomain")
+    ],
     targets: [
-        .target(name: "SplineStorage"),
+        .target(
+            name: "SplineStorage",
+            dependencies: [
+                .product(name: "SplineDomain", package: "SplineDomain")
+            ]
+        ),
         .testTarget(name: "SplineStorageTests", dependencies: ["SplineStorage"])
     ]
 )

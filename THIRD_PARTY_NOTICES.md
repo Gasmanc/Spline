@@ -1,9 +1,19 @@
 # Third-Party Notices
 
-This project currently has no external third-party runtime dependencies integrated.
+## webp
+- Project: libwebp
+- Version: 1.6.0
+- License: BSD-3-Clause
+- Source: https://chromium.googlesource.com/webm/libwebp
 
-When external dependencies are added, this file will include:
-1. Package name and version
-2. Project URL
-3. License text or attribution requirements
-4. Any required distribution notices
+## libavif
+- Project: libavif
+- Version: 1.4.0
+- License: BSD-2-Clause
+- Source: https://github.com/AOMediaCodec/libavif
+
+## vtracer
+- Project: vtracer
+- Version: 0.6.5
+- License: MIT OR Apache-2.0
+- Source: https://github.com/visioncortex/vtracer

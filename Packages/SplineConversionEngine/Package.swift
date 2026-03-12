@@ -15,9 +15,29 @@ let package = Package(
     ],
     targets: [
         .target(
+            name: "CWebPBridge",
+            cSettings: [
+                .unsafeFlags(["-I/opt/homebrew/include"], .when(platforms: [.macOS]))
+            ],
+            linkerSettings: [
+                .unsafeFlags(["-L/opt/homebrew/lib", "-lwebp"], .when(platforms: [.macOS]))
+            ]
+        ),
+        .target(
+            name: "CAVIFBridge",
+            cSettings: [
+                .unsafeFlags(["-I/opt/homebrew/include"], .when(platforms: [.macOS]))
+            ],
+            linkerSettings: [
+                .unsafeFlags(["-L/opt/homebrew/lib", "-lavif"], .when(platforms: [.macOS]))
+            ]
+        ),
+        .target(
             name: "SplineConversionEngine",
             dependencies: [
-                .product(name: "SplineDomain", package: "SplineDomain")
+                .product(name: "SplineDomain", package: "SplineDomain"),
+                "CWebPBridge",
+                "CAVIFBridge"
             ]
         ),
         .testTarget(

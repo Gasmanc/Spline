@@ -2,25 +2,27 @@
 
 ## Scope reviewed
 - ImageIO decode and encode service
+- External codec bridge for WebP and AVIF using native libraries
 - File conversion orchestration service
-- Error taxonomy for conversion failures
 
 ## Quality review
-1. File conversion uses typed errors and explicit unsupported format handling.
-2. Raster codec mapping is explicit and conservative.
-3. Test verifies rejection behavior for unsupported vector-target pipeline in current stage.
+1. WebP and AVIF decode/encode now use explicit native codec bridges.
+2. Bridge memory ownership is explicit and released deterministically.
+3. Typed errors are returned on decode and encode failures.
+4. Round-trip tests verify practical codec behavior for both formats.
 
 ## Edge case review
-1. Vector formats are explicitly rejected by current raster path to avoid silent corruption.
-2. Decode and encode failures return actionable errors.
+1. Unsupported vector paths remain fail-closed.
+2. Bridge code validates null pointers and conversion return codes.
+3. RGBA conversion path avoids force unwrapping and has deterministic color space handling.
 
 ## Performance review
-1. ImageIO single-frame path is efficient for baseline static conversions.
-2. Current implementation is intentionally conservative until animation and advanced codec paths are added.
+1. Codec paths avoid intermediate disk conversion.
+2. Data transfer and CGImage construction are direct and bounded.
 
 ## Security review
-1. Local file URLs only.
-2. No dynamic code execution or shell dispatch.
+1. File writes are atomic.
+2. No network access introduced.
 
 ## Review result
 PASS

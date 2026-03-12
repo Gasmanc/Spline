@@ -62,7 +62,7 @@ public struct FileConversionService: Sendable {
         case .eps:
             return try DecodedRasterImage(cgImage: decodeEPS(inputURL))
         case .svg:
-            throw ConversionEngineError.unsupportedFormat
+            return try DecodedRasterImage(cgImage: svgService.rasterizeSVGDocument(inputURL: inputURL))
         case .jpeg, .bmp, .heic, .webp, .gif, .tiff, .png, .avif, .hdr:
             return try codecs.decodeRasterImage(at: inputURL, as: format)
         }

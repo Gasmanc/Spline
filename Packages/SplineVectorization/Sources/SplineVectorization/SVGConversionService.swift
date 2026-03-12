@@ -8,13 +8,16 @@ import SplineDomain
 public struct SVGConversionService: Sendable {
     private let tracer: RasterSVGTracer
     private let externalTracer: ExternalVTracerService
+    private let rasterizer: SVGRasterizer
 
     public init(
         tracer: RasterSVGTracer = RasterSVGTracer(),
-        externalTracer: ExternalVTracerService = ExternalVTracerService()
+        externalTracer: ExternalVTracerService = ExternalVTracerService(),
+        rasterizer: SVGRasterizer = SVGRasterizer()
     ) {
         self.tracer = tracer
         self.externalTracer = externalTracer
+        self.rasterizer = rasterizer
     }
 
     public func convertToSVG(inputURL: URL, outputURL: URL, intent: ConversionIntent) throws {
@@ -59,6 +62,10 @@ public struct SVGConversionService: Sendable {
         } catch {
             throw SVGTraceError.writeFailed
         }
+    }
+
+    public func rasterizeSVGDocument(inputURL: URL) throws -> CGImage {
+        try rasterizer.rasterize(inputURL: inputURL)
     }
 
     private func shouldUseExternalTracer(for format: ImageFormat) -> Bool {

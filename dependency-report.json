@@ -1,4 +1,23 @@
 {
-  "generatedAt": "2026-03-11T00:00:00Z",
-  "dependencies": []
+  "generatedAt": "2026-03-11T22:00:00Z",
+  "dependencies": [
+    {
+      "name": "webp",
+      "version": "1.6.0",
+      "license": "BSD-3-Clause",
+      "source": "Homebrew"
+    },
+    {
+      "name": "libavif",
+      "version": "1.4.0",
+      "license": "BSD-2-Clause",
+      "source": "Homebrew"
+    },
+    {
+      "name": "vtracer",
+      "version": "0.6.5",
+      "license": "MIT",
+      "source": "crates.io"
+    }
+  ]
 }

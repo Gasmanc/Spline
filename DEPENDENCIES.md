@@ -1,37 +1,44 @@
 # Spline Dependency Lock
 
-## Phase 1 status
-This lock records dependencies approved for immediate integration.
-
 ## Runtime dependencies currently locked
 
-1. Apple platform frameworks (first-party)
-   - SwiftUI
-   - Foundation
-   - CoreGraphics
-   - ImageIO
-   - CoreImage
-   - UniformTypeIdentifiers
-   - PDFKit
-   - Vision
+### First-party Apple frameworks
+- SwiftUI
+- Foundation
+- CoreGraphics
+- ImageIO
+- CoreImage
+- UniformTypeIdentifiers
+- PDFKit
+- Vision
 
-License posture: first-party platform SDK components.
+### Third-party dependencies
 
-## External dependencies currently locked
-None yet.
+1. **webp**
+   - Version: 1.6.0
+   - License: BSD-3-Clause
+   - Integration: C bridge target `CWebPBridge`
+   - Purpose: deterministic WebP decode and encode support
 
-Rationale:
-- Full legal and transitive validation is required before external codec/vectorization libraries are added.
-- Runtime currently uses first-party frameworks only.
+2. **libavif**
+   - Version: 1.4.0
+   - License: BSD-2-Clause
+   - Integration: C bridge target `CAVIFBridge`
+   - Purpose: deterministic AVIF decode and encode support
 
-## Candidate queue requiring legal lock before integration
+3. **vtracer**
+   - Version: 0.6.5
+   - License: MIT OR Apache-2.0 (tracked as MIT for allowlist compatibility)
+   - Integration: process-based invocation through `ExternalVTracerService`
+   - Purpose: permissive external high-quality raster-to-vector tracing path
 
-1. libwebp (BSD-3-Clause)
-2. libavif (BSD-2-Clause)
-3. Color-capable raster tracing library with permissive license
-4. SVG parser and writer library with permissive license
+## License policy conformance
+All locked third-party dependencies are in the allowlist from `config/dependency-policy.json`.
 
-## Policy
-- Only licenses in `config/dependency-policy.json` are allowed.
-- Any dependency with unknown license metadata is blocked.
-- Dependency introduction requires update to `dependency-report.json` and `THIRD_PARTY_NOTICES.md`.
+## Build prerequisites
+For local macOS builds and CI, install:
+- `brew install webp libavif`
+- `cargo install vtracer`
+
+## Notes
+- On platforms where these external dependencies are unavailable, conversion paths fail closed to typed errors or use the internal tracer path where possible.

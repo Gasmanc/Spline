@@ -11,7 +11,8 @@ let package = Package(
         .library(name: "SplineConversionEngine", targets: ["SplineConversionEngine"])
     ],
     dependencies: [
-        .package(path: "../SplineDomain")
+        .package(path: "../SplineDomain"),
+        .package(path: "../SplineVectorization")
     ],
     targets: [
         .target(
@@ -36,6 +37,7 @@ let package = Package(
             name: "SplineConversionEngine",
             dependencies: [
                 .product(name: "SplineDomain", package: "SplineDomain"),
+                .product(name: "SplineVectorization", package: "SplineVectorization"),
                 "CWebPBridge",
                 "CAVIFBridge"
             ]

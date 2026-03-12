@@ -2,6 +2,7 @@ import CoreGraphics
 import Foundation
 import ImageIO
 import PDFKit
+import UniformTypeIdentifiers
 import SplineDomain
 
 public struct SVGConversionService: Sendable {
@@ -43,7 +44,11 @@ public struct SVGConversionService: Sendable {
         }
 
         let rasterImage = try decodeImage(inputURL: inputURL, format: intent.sourceFormat)
-        let svg = try tracer.trace(image: rasterImage, mode: intent.options.traceMode, controls: intent.options.traceControls)
+        try convertRasterImageToSVG(rasterImage, outputURL: outputURL, intent: intent)
+    }
+
+    public func convertRasterImageToSVG(_ image: CGImage, outputURL: URL, intent: ConversionIntent) throws {
+        let svg = try tracer.trace(image: image, mode: intent.options.traceMode, controls: intent.options.traceControls)
 
         guard let outputData = svg.data(using: .utf8) else {
             throw SVGTraceError.writeFailed

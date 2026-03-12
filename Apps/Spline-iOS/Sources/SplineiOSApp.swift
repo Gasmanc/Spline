@@ -17,9 +17,11 @@ private struct AppRootView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 16) {
                 ConversionFormView()
-                Text("Status: \(statusMessage)")
+                Divider()
+                FileConversionFlowView()
+                Text("Runtime: \(statusMessage)")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }

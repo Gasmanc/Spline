@@ -111,10 +111,12 @@ License gate:
 
 ## Open decisions requiring explicit follow-up
 
-1. **Accessibility scope depth:** minimum baseline or full WCAG-inspired parity for all interactions.
-2. **OCR engine selection:** evaluate quality/performance trade-off and language scope.
-3. **EPS path on iOS/iPadOS:** confirm parity approach if certain APIs are macOS-preferred.
-4. **Minimum OS exact versions:** requirement given as "last 4 years" must be converted into explicit deployment targets.
+Resolved by `docs/adr/ADR-0002-v1-product-decisions-and-eps-parity-contract.md`:
+
+1. Accessibility baseline depth.
+2. OCR language/script scope for v1.
+3. EPS parity contract on iOS/iPadOS/macOS.
+4. Exact minimum OS deployment targets.
 
 ## Validation criteria
 

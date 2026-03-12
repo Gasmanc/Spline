@@ -1,28 +1,29 @@
 # Phase 3 Code Review
 
 ## Scope reviewed
-- ImageIO decode and encode service
-- External codec bridge for WebP and AVIF using native libraries
-- File conversion orchestration service
+- File conversion orchestration with broader matrix handling
+- PDF and RAW raster decoding pathways
+- Raster-to-PDF encoding pathway
+- SVG-target integration through vectorization service
 
 ## Quality review
-1. WebP and AVIF decode/encode now use explicit native codec bridges.
-2. Bridge memory ownership is explicit and released deterministically.
-3. Typed errors are returned on decode and encode failures.
-4. Round-trip tests verify practical codec behavior for both formats.
+1. Conversion service now routes by source and target format semantics.
+2. Decode and encode responsibilities are split into focused helpers.
+3. Unsupported format edges fail closed with typed errors.
+4. Test coverage validates PNG→SVG and PNG→PDF conversion outcomes.
 
 ## Edge case review
-1. Unsupported vector paths remain fail-closed.
-2. Bridge code validates null pointers and conversion return codes.
-3. RGBA conversion path avoids force unwrapping and has deterministic color space handling.
+1. PDF rendering dimensions are clamped to minimum valid bounds.
+2. RAW decode path checks `CIImage` and `CGImage` creation failures.
+3. Vector source formats without implemented rasterizers are explicitly blocked.
 
 ## Performance review
-1. Codec paths avoid intermediate disk conversion.
-2. Data transfer and CGImage construction are direct and bounded.
+1. Direct in-memory raster handling avoids unnecessary intermediate files.
+2. PDF encode path writes one page with single draw operation for predictable cost.
 
 ## Security review
-1. File writes are atomic.
-2. No network access introduced.
+1. No remote processing.
+2. Output writes remain local and explicit.
 
 ## Review result
 PASS

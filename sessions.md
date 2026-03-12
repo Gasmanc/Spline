@@ -385,3 +385,57 @@ Authoritative source:
 1. Extend SVG rasterizer support to additional primitives and path data.
 2. Expand EPS rendering fallback strategy for broader compatibility.
 3. Wire iPadOS app target in generated app project with keyboard and files workflows.
+
+## Session 2026-03-12 16:55 GMT+10
+
+### Participants
+- Human: Product Owner
+- Agent: Coding Assistant
+
+### Objectives
+1. Execute requested items 1-3 sequentially: richer SVG raster support, EPS fallback, iPadOS/files wiring.
+
+### Actions performed
+1. Expanded SVG rasterizer to support `rect`, `circle`, `line`, and basic `path` commands (`M`, `L`, `Z`).
+2. Refactored SVG parsing into dedicated parser module for maintainability.
+3. Added tiered EPS decoding fallback path (ImageIO, Core Image, macOS `sips` conversion fallback).
+4. Added iPadOS app target wiring and Files integration conversion flow (`fileImporter` + conversion + `fileExporter`).
+5. Added targeted review documents for each requested item.
+6. Ran strict quality gates and zero-debt verification.
+
+### Decisions made
+1. SVG parser remains deterministic and intentionally scoped to core primitives while remaining extendable.
+2. EPS fallback prioritizes native decode paths before process-based conversion fallback.
+3. iPadOS target uses explicit app target with device-family-specific wiring.
+
+### Files changed
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGRasterizer.swift`
+- `Packages/SplineVectorization/Sources/SplineVectorization/SVGDocumentParser.swift`
+- `Packages/SplineVectorization/Tests/SplineVectorizationTests/SVGRasterizerTests.swift`
+- `Packages/SplineConversionEngine/Sources/SplineConversionEngine/FileConversionService.swift`
+- `Apps/Spline-iOS/Sources/FileConversionFlowView.swift`
+- `Apps/Spline-iOS/Sources/SplineiOSApp.swift`
+- `Apps/Spline-iPadOS/Sources/SplineiPadOSApp.swift`
+- `Apps/project.yml`
+- `Apps/README.md`
+- `docs/reviews/next-1-svg-primitives-review.md`
+- `docs/reviews/next-2-eps-fallback-review.md`
+- `docs/reviews/next-3-ipados-files-flow-review.md`
+- `sessions.md`
+
+### Tests / verification
+- Command: `scripts/run-quality-gates.sh`
+- Result: Pass
+- Command: `node ~/.pi/agent/zero-debt/scripts/zero-debt-verify.mjs`
+- Result: Pass
+
+### Risks found
+1. SVG path support currently covers core path commands and should be expanded for full SVG path grammar.
+2. EPS fallback via `sips` is macOS-specific and needs platform-specific strategy for non-macOS targets.
+
+### Open questions created or updated
+- O-004 remains open for final EPS parity contract.
+
+### Next recommended actions
+1. Expand SVG path grammar support (curves, arcs, relative multi-segment paths).
+2. Add iPadOS keyboard interaction tests and Files workflow integration tests at app layer.
